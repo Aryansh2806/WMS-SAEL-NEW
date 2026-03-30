@@ -1,0 +1,177 @@
+{
+  "theme_archetype": {
+    "domain": "Warehouse Inventory Management System",
+    "theme": "Hybrid (Dark Sidebar, Light Content)",
+    "archetype": "Archetype 4 (Swiss & High-Contrast) adapted for Tactical Logistics",
+    "emotional_tone": "Authoritative, Efficient, Clear, Reliable",
+    "rationale": "High contrast and absolute clarity are paramount for warehouse operations. The design utilizes a dark navy command sidebar to anchor navigation, paired with a white/light content area for maximum data legibility. Touch-friendly scaling applies to action-heavy screens."
+  },
+  "colors": {
+    "backgrounds": {
+      "sidebar": "#1a2744",
+      "sidebar_hover": "#263659",
+      "sidebar_active_bg": "#2e416b",
+      "app_bg": "#f9fafb",
+      "surface_card": "#ffffff",
+      "header_bg": "#ffffff"
+    },
+    "text": {
+      "primary": "#111827",
+      "secondary": "#4b5563",
+      "tertiary": "#6b7280",
+      "sidebar_primary": "#ffffff",
+      "sidebar_secondary": "#9ca3af",
+      "accent": "#f59e0b",
+      "on_accent": "#ffffff"
+    },
+    "primary_accent": {
+      "base": "#f59e0b",
+      "hover": "#d97706",
+      "ring": "#fcd34d"
+    },
+    "status_badges": {
+      "available": {
+        "bg": "#d1fae5",
+        "text": "#065f46",
+        "border": "#34d399",
+        "solid": "#10b981"
+      },
+      "blocked": {
+        "bg": "#fee2e2",
+        "text": "#991b1b",
+        "border": "#f87171",
+        "solid": "#ef4444"
+      },
+      "quality_hold": {
+        "bg": "#ffedd5",
+        "text": "#9a3412",
+        "border": "#fb923c",
+        "solid": "#f97316"
+      },
+      "empty_bin": {
+        "bg": "#f3f4f6",
+        "text": "#374151",
+        "border": "#9ca3af",
+        "solid": "#9ca3af"
+      }
+    },
+    "borders": {
+      "subtle": "#e5e7eb",
+      "medium": "#d1d5db",
+      "sidebar_divider": "#2d3c5f"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "heading": "IBM Plex Sans, sans-serif",
+      "body": "IBM Plex Sans, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "scales": {
+      "h1": "text-3xl sm:text-4xl font-bold tracking-tight",
+      "h2": "text-2xl sm:text-3xl font-semibold tracking-tight",
+      "h3": "text-xl font-semibold",
+      "h4": "text-lg font-medium",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm text-secondary",
+      "overline": "text-xs font-bold uppercase tracking-[0.15em] text-tertiary",
+      "sku_label": "font-mono text-sm tracking-widest text-primary"
+    },
+    "rules": {
+      "headings": "Left-aligned for all operational screens. Tight tracking on large text.",
+      "numbers": "Use tabular-nums for tables, dashboards, and financial figures."
+    }
+  },
+  "spacing_and_layout": {
+    "app_shell": {
+      "sidebar_width": "w-64 flex-shrink-0",
+      "header_height": "h-16",
+      "mobile_behavior": "Sidebar hidden behind hamburger menu on mobile, off-canvas drawer."
+    },
+    "containers": {
+      "dashboard_grid": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6",
+      "page_padding": "p-4 sm:p-6 lg:p-8",
+      "card_padding": "p-6"
+    },
+    "touch_interfaces": {
+      "operator_screens": "For Material Issue and Putaway screens, use list-based card layouts instead of dense data tables on mobile.",
+      "button_size": "Min-height h-14 (56px) for primary actions on operator screens.",
+      "input_size": "Min-height h-12 (48px) for text inputs and dropdowns to prevent missed taps."
+    }
+  },
+  "surfaces": {
+    "cards": {
+      "style": "Flat solid background, 1px subtle border, rounded-lg, no default shadow.",
+      "hover": "Hover state gets a subtle lift (-translate-y-0.5) and shadow-sm."
+    },
+    "header": {
+      "style": "Solid white background, sticky top-0, z-40, border-b border-gray-200."
+    },
+    "modals": {
+      "overlay": "bg-slate-900/60 backdrop-blur-sm",
+      "content": "bg-white rounded-xl shadow-2xl border border-gray-100"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#f59e0b] text-white hover:bg-[#d97706] rounded-md font-medium transition-colors",
+      "secondary": "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 rounded-md",
+      "danger": "bg-red-600 text-white hover:bg-red-700 rounded-md"
+    },
+    "tables": {
+      "style": "w-full text-left text-sm text-gray-500",
+      "header": "bg-gray-50 text-xs uppercase text-gray-700 border-b border-gray-200",
+      "row": "bg-white border-b border-gray-200 hover:bg-gray-50 transition-colors"
+    },
+    "forms": {
+      "input": "border border-gray-300 rounded-md focus:ring-2 focus:ring-[#fcd34d] focus:border-[#f59e0b] transition-all",
+      "label": "block text-sm font-medium text-gray-700 mb-1"
+    },
+    "badges": {
+      "shape": "rounded-full px-2.5 py-0.5 text-xs font-medium inline-flex items-center gap-1.5 border"
+    },
+    "libraries": {
+      "icons": "lucide-react",
+      "charts": "recharts",
+      "date": "date-fns, react-day-picker",
+      "barcode": "react-qr-code, react-barcode"
+    }
+  },
+  "motion_interactions": {
+    "transitions": {
+      "default": "transition-all duration-200 ease-in-out",
+      "hover": "transform transition-transform duration-200"
+    },
+    "feedback": {
+      "click": "active:scale-[0.98]",
+      "loading": "Use subtle skeleton loaders with pulse animation for tables and dashboard widgets rather than full-page spinners."
+    }
+  },
+  "media_and_images": {
+    "auth_background": {
+      "url": "https://images.pexels.com/photos/221047/pexels-photo-221047.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Large warehouse interior, used for the login/authentication screen background, should have an overlay of bg-[#1a2744]/80 to match the brand."
+    },
+    "empty_state_illustration": {
+      "url": "https://images.pexels.com/photos/13443134/pexels-photo-13443134.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Shipping containers stacked. Use subtly (low opacity or grayscale) for empty dashboard states or reporting headers."
+    }
+  },
+  "accessibility_and_testing": {
+    "contrast": "Ensure amber text (#f59e0b) is only used on very dark or very light backgrounds. Over white, use #d97706 for text to pass WCAG AA.",
+    "focus": "All interactive elements must have focus-visible outlines.",
+    "testing_attributes": "All buttons, inputs, tabs, and menu items MUST include role-based data-testid attributes (e.g., data-testid='login-submit-button', data-testid='sidebar-inventory-link')."
+  },
+  "instructions_to_main_agent": [
+    "Set up Tailwind config with the custom colors provided in the colors block.",
+    "Use Shadcn components for UI primitives (Tables, Cards, Dialogs, Selects, Forms).",
+    "Implement a persistent Layout shell with the #1a2744 sidebar and a white top header.",
+    "For the Material Issue and Putaway routes, ensure the interface shifts to large, touch-friendly UI patterns (large cards, h-14 buttons).",
+    "Create dynamic color-coded Badges for stock statuses based on the provided status_badges palette.",
+    "Implement user roles (Admin, Warehouse Operator, Store In-Charge, Inventory Controller, Auditor, Management Viewer) using context or a centralized store, conditionally rendering navigation links.",
+    "Include 'react-qr-code' and 'react-barcode' for Sticker/Label Generation.",
+    "Do NOT use 'Inter' for headings. Use 'IBM Plex Sans' globally, and 'JetBrains Mono' for SKUs and barcodes.",
+    "Use the provided image URLs strictly. The login page must use the auth_background URL with a heavy navy overlay.",
+    "Apply data-testid to every clickable element."
+  ]
+}
