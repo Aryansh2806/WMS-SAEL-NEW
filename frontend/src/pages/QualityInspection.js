@@ -109,7 +109,7 @@ const QualityInspection = () => {
       }
 
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(`${backendUrl}/api/grn/${selectedGRN.grn_id}/inspection`, {
+      const response = await fetch(`${backendUrl}/api/grn/${selectedGRN.grn_id}/inspect`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
