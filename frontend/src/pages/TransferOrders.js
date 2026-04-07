@@ -5,11 +5,26 @@ const TransferOrders = () => {
   const { user } = useAuth();
   const [transferOrders, setTransferOrders] = useState([]);
   const [transferRequirements, setTransferRequirements] = useState([]);
+  const [materials, setMaterials] = useState([]);
+  const [bins, setBins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('orders');
   const [selectedTO, setSelectedTO] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCreateTRModal, setShowCreateTRModal] = useState(false);
   const [selectedTR, setSelectedTR] = useState('');
+  
+  // Form state for creating TR
+  const [trForm, setTrForm] = useState({
+    tr_type: 'STOCK_TRANSFER',
+    material_id: '',
+    required_quantity: 0,
+    stock_category: 'UNRES',
+    destination_bin: '',
+    storage_type: 'REGU',
+    priority: 5,
+    reference_doc_number: ''
+  });
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -36,6 +51,22 @@ const TransferOrders = () => {
       });
       const trData = await trResponse.json();
       setTransferRequirements(trData.transfer_requirements || []);
+      
+      // Fetch Materials
+      const materialsResponse = await fetch(`${backendUrl}/api/materials`, {
+        credentials: 'include',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const materialsData = await materialsResponse.json();
+      setMaterials(materialsData || []);
+      
+      // Fetch Bins
+      const binsResponse = await fetch(`${backendUrl}/api/bins`, {
+        credentials: 'include',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const binsData = await binsResponse.json();
+      setBins(binsData || []);
 
       setLoading(false);
     } catch (error) {
@@ -68,6 +99,66 @@ const TransferOrders = () => {
       console.error('Error creating TO:', error);
       alert('Failed to create Transfer Order');
     }
+  };
+  
+  const createTransferRequirement = async () => {
+    if (!trForm.material_id || !trForm.required_quantity) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('auth_token');
+      
+      // Build query params
+      const params = new URLSearchParams({
+        tr_type: trForm.tr_type,
+        material_id: trForm.material_id,
+        required_quantity: trForm.required_quantity,
+        stock_category: trForm.stock_category,
+        priority: trForm.priority
+      });
+      
+      if (trForm.destination_bin) params.append('destination_bin', trForm.destination_bin);
+      if (trForm.storage_type) params.append('storage_type', trForm.storage_type);
+      if (trForm.reference_doc_number) params.append('reference_doc_number', trForm.reference_doc_number);
+      
+      const response = await fetch(`${backendUrl}/api/wm/transfer-requirements?${params}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Transfer Requirement ${data.tr_number} created successfully!`);
+        setShowCreateTRModal(false);
+        resetTRForm();
+        fetchData();
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to create Transfer Requirement');
+      }
+    } catch (error) {
+      console.error('Error creating TR:', error);
+      alert('Failed to create Transfer Requirement');
+    }
+  };
+  
+  const resetTRForm = () => {
+    setTrForm({
+      tr_type: 'STOCK_TRANSFER',
+      material_id: '',
+      required_quantity: 0,
+      stock_category: 'UNRES',
+      destination_bin: '',
+      storage_type: 'REGU',
+      priority: 5,
+      reference_doc_number: ''
+    });
   };
 
   const confirmTO = async (toNumber) => {
@@ -251,6 +342,28 @@ const TransferOrders = () => {
       {/* Transfer Requirements Tab */}
       {activeTab === 'requirements' && (
         <div>
+          {/* Action Buttons */}
+          <div className="mb-4 flex justify-between items-center">
+            <div className="text-sm text-gray-600">
+              {transferRequirements.length} Transfer Requirement(s)
+            </div>
+            <div className="space-x-2">
+              <button
+                onClick={() => setShowCreateTRModal(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+              >
+                + Create Transfer Requirement
+              </button>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                disabled={transferRequirements.length === 0}
+              >
+                Create TO from TR
+              </button>
+            </div>
+          </div>
+          
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -420,6 +533,152 @@ const TransferOrders = () => {
             >
               Close
             </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Create Transfer Requirement Modal */}
+      {showCreateTRModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full p-6">
+            <h3 className="text-xl font-semibold mb-4">Create Transfer Requirement</h3>
+            
+            <div className="space-y-4">
+              {/* TR Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">TR Type *</label>
+                <select
+                  value={trForm.tr_type}
+                  onChange={(e) => setTrForm({...trForm, tr_type: e.target.value})}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                  <option value="STOCK_TRANSFER">Stock Transfer</option>
+                  <option value="GR">Goods Receipt</option>
+                  <option value="GI">Goods Issue</option>
+                  <option value="MANUAL">Manual</option>
+                </select>
+              </div>
+              
+              {/* Material */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Material *</label>
+                <select
+                  value={trForm.material_id}
+                  onChange={(e) => setTrForm({...trForm, material_id: e.target.value})}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                  <option value="">Select Material</option>
+                  {materials.map(mat => (
+                    <option key={mat.material_id} value={mat.material_id}>
+                      {mat.material_code} - {mat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Quantity */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Required Quantity *</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={trForm.required_quantity}
+                  onChange={(e) => setTrForm({...trForm, required_quantity: parseFloat(e.target.value) || 0})}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  placeholder="Enter quantity"
+                />
+              </div>
+              
+              {/* Destination Bin */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Destination Bin (Optional)</label>
+                <select
+                  value={trForm.destination_bin}
+                  onChange={(e) => setTrForm({...trForm, destination_bin: e.target.value})}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                  <option value="">Select Bin</option>
+                  {bins.map(bin => (
+                    <option key={bin.bin_id} value={bin.bin_code}>
+                      {bin.bin_code} - {bin.zone}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Stock Category */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Stock Category</label>
+                <select
+                  value={trForm.stock_category}
+                  onChange={(e) => setTrForm({...trForm, stock_category: e.target.value})}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                  <option value="UNRES">Unrestricted (UNRES)</option>
+                  <option value="QINSP">Quality Inspection (QINSP)</option>
+                  <option value="BLOCK">Blocked (BLOCK)</option>
+                  <option value="RETRN">Returns (RETRN)</option>
+                </select>
+              </div>
+              
+              {/* Priority */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Priority (1-10)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={trForm.priority}
+                  onChange={(e) => setTrForm({...trForm, priority: parseInt(e.target.value) || 5})}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                />
+              </div>
+              
+              {/* Storage Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Storage Type</label>
+                <select
+                  value={trForm.storage_type}
+                  onChange={(e) => setTrForm({...trForm, storage_type: e.target.value})}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                  <option value="REGU">Regular (REGU)</option>
+                  <option value="BULK">Bulk Storage (BULK)</option>
+                  <option value="PICK">Picking Area (PICK)</option>
+                  <option value="QUAR">Quarantine (QUAR)</option>
+                </select>
+              </div>
+              
+              {/* Reference Document */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Reference Document (Optional)</label>
+                <input
+                  type="text"
+                  value={trForm.reference_doc_number}
+                  onChange={(e) => setTrForm({...trForm, reference_doc_number: e.target.value})}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  placeholder="e.g., GRN-20260407-001"
+                />
+              </div>
+            </div>
+            
+            <div className="mt-6 flex justify-end space-x-2">
+              <button
+                onClick={() => {
+                  setShowCreateTRModal(false);
+                  resetTRForm();
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={createTransferRequirement}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Create Transfer Requirement
+              </button>
+            </div>
           </div>
         </div>
       )}
