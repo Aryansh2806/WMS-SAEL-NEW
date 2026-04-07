@@ -34,8 +34,8 @@ const Putaway = () => {
     try {
       const [putawaysRes, grnsRes, binsRes] = await Promise.all([
         putawayAPI.getAll(statusFilter !== 'all' ? { status: statusFilter } : {}),
-        grnAPI.getAll({ status: 'pending' }),
-        binAPI.getAll({ status: 'empty' })
+        grnAPI.getAll({ status: 'completed' }), // Changed from 'pending' to 'completed'
+        binAPI.getAll()
       ]);
       setPutaways(putawaysRes.data);
       setPendingGRNs(grnsRes.data);
@@ -128,9 +128,9 @@ const Putaway = () => {
               <div className="space-y-6">
                 {/* Step 1: Select GRN */}
                 <div className="space-y-3">
-                  <Label className="text-base font-semibold">1. Select GRN</Label>
+                  <Label className="text-base font-semibold">1. Select GRN (Completed & Ready for Putaway)</Label>
                   {pendingGRNs.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No pending GRNs available</p>
+                    <p className="text-gray-500 text-sm">No completed GRNs available for putaway. Complete quality inspection first.</p>
                   ) : (
                     <div className="grid gap-2">
                       {pendingGRNs.map((grn) => (
