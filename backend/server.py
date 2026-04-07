@@ -1250,13 +1250,15 @@ async def update_grn_inspection(
     updates: List[GRNUpdateItem],
     user: dict = Depends(require_roles(["Admin", "Store In-Charge", "Inventory Controller"]))
 ):
-    """Update quality inspection status and quantities for GRN items"""
+    """Update quality inspection status, quantities, and automatically update stock"""
     grn = await db.grn.find_one({"grn_id": grn_id}, {"_id": 0})
     if not grn:
         raise HTTPException(status_code=404, detail="GRN not found")
     
     if grn["status"] == "completed":
         raise HTTPException(status_code=400, detail="GRN is already completed")
+    
+    now = datetime.now(timezone.utc)
     
     # Update items
     updated_items = grn["items"]
@@ -1285,32 +1287,87 @@ async def update_grn_inspection(
     
     # Recalculate totals
     for item in updated_items:
-        total_accepted += item["accepted_quantity"]
-        total_rejected += item["rejected_quantity"]
-        total_pending += item["pending_quantity"]
+        total_accepted += item.get("accepted_quantity", 0)
+        total_rejected += item.get("rejected_quantity", 0)
+        total_pending += item.get("pending_quantity", 0)
+    
+    # Check if all items are fully inspected (no pending quantities)
+    all_inspected = total_pending == 0
     
     # Determine status
-    total_received = grn["total_received_quantity"]
-    if total_pending > 0:
-        new_status = "partial"
-    elif total_accepted + total_rejected == total_received:
-        new_status = "partial" if total_rejected > 0 else "pending"  # Still need to complete
+    if all_inspected:
+        new_status = "completed"
+        
+        # AUTO-UPDATE STOCK for accepted quantities
+        for item in updated_items:
+            accepted_qty = item.get("accepted_quantity", 0)
+            if accepted_qty > 0:
+                # Update material stock
+                await db.materials.update_one(
+                    {"material_id": item["material_id"]},
+                    {"$inc": {"current_stock": accepted_qty}}
+                )
+                
+                # Create stock movement for accepted goods
+                movement = {
+                    "movement_id": f"mov_{uuid.uuid4().hex[:12]}",
+                    "movement_type": "inward",
+                    "material_id": item["material_id"],
+                    "material_code": item["material_code"],
+                    "quantity": accepted_qty,
+                    "to_bin": item.get("bin_location"),
+                    "reference_type": "GRN",
+                    "reference_id": grn_id,
+                    "batch_number": item.get("batch_number"),
+                    "remarks": f"GRN: {grn['grn_number']}, Batch: {item.get('batch_number')}, Expiry: {item.get('expiry_date', 'N/A')}",
+                    "created_at": now.isoformat(),
+                    "created_by": user["user_id"]
+                }
+                await db.stock_movements.insert_one(movement)
+                
+                # Update bin if specified
+                if item.get("bin_location"):
+                    bin_doc = await db.bins.find_one({"bin_code": item["bin_location"]}, {"_id": 0})
+                    if bin_doc:
+                        await db.bins.update_one(
+                            {"bin_code": item["bin_location"]},
+                            {
+                                "$inc": {"current_stock": accepted_qty},
+                                "$set": {
+                                    "status": "occupied",
+                                    "material_id": item["material_id"],
+                                    "material_code": item["material_code"],
+                                    "updated_at": now.isoformat()
+                                }
+                            }
+                        )
     else:
-        new_status = "pending"
+        # Still have pending quantities
+        new_status = "partial"
+    
+    # Update GRN
+    update_data = {
+        "items": updated_items,
+        "total_accepted_quantity": total_accepted,
+        "total_rejected_quantity": total_rejected,
+        "total_pending_quantity": total_pending,
+        "status": new_status,
+        "has_partial_receipts": total_pending > 0
+    }
+    
+    if all_inspected:
+        update_data["completed_at"] = now.isoformat()
     
     await db.grn.update_one(
         {"grn_id": grn_id},
-        {"$set": {
-            "items": updated_items,
-            "total_accepted_quantity": total_accepted,
-            "total_rejected_quantity": total_rejected,
-            "total_pending_quantity": total_pending,
-            "status": new_status,
-            "has_partial_receipts": total_pending > 0
-        }}
+        {"$set": update_data}
     )
     
-    return {"message": "GRN inspection updated successfully", "status": new_status}
+    return {
+        "message": "Quality inspection completed and stock updated successfully" if all_inspected else "GRN inspection updated successfully",
+        "status": new_status,
+        "stock_updated": all_inspected
+    }
 
 @api_router.put("/grn/{grn_id}/complete")
 async def complete_grn(grn_id: str, user: dict = Depends(require_roles(["Admin", "Store In-Charge"]))):
