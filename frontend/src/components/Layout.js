@@ -18,7 +18,8 @@ import {
   Settings,
   PieChart,
   ArrowLeftRight,
-  FileText
+  FileText,
+  ClipboardCheck
 } from 'lucide-react';
 import { Button } from './ui/button';
 import {
@@ -35,6 +36,7 @@ const navItems = [
   { path: '/stock-dashboard', icon: PieChart, label: 'Stock Analytics', roles: ['Admin', 'Store In-Charge', 'Inventory Controller', 'Auditor', 'Management Viewer'] },
   { path: '/materials', icon: Package, label: 'Material Master', roles: ['Admin', 'Store In-Charge', 'Inventory Controller', 'Auditor'] },
   { path: '/grn', icon: FileInput, label: 'GRN / Inward', roles: ['Admin', 'Store In-Charge', 'Warehouse Operator', 'Inventory Controller', 'Auditor'] },
+  { path: '/quality-inspection', icon: ClipboardCheck, label: 'Quality Inspection', roles: ['Admin', 'Store In-Charge', 'Inventory Controller', 'Auditor'] },
   { path: '/labels', icon: Tags, label: 'Labels', roles: ['Admin', 'Store In-Charge', 'Warehouse Operator'] },
   { path: '/bins', icon: MapPin, label: 'Bin Locations', roles: ['Admin', 'Store In-Charge', 'Inventory Controller', 'Auditor'] },
   { path: '/putaway', icon: ArrowDownToLine, label: 'Putaway', roles: ['Admin', 'Store In-Charge', 'Warehouse Operator'] },

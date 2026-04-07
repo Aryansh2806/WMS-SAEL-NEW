@@ -20,6 +20,7 @@ import Reports from './pages/Reports';
 import Users from './pages/Users';
 import TransferOrders from './pages/TransferOrders';
 import WMReports from './pages/WMReports';
+import QualityInspection from './pages/QualityInspection';
 
 // Protected Route wrapper
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -103,6 +104,14 @@ const AppRouter = () => {
         element={
           <ProtectedRoute allowedRoles={['Admin', 'Store In-Charge', 'Warehouse Operator', 'Inventory Controller', 'Auditor']}>
             <GRN />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/quality-inspection"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Store In-Charge', 'Inventory Controller', 'Auditor']}>
+            <QualityInspection />
           </ProtectedRoute>
         }
       />
