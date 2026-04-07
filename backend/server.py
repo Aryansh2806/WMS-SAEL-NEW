@@ -244,9 +244,9 @@ class GRN(BaseModel):
 class BinLocationBase(BaseModel):
     bin_code: str
     zone: str
-    aisle: str
-    rack: str
-    level: str
+    aisle: Optional[str] = None
+    rack: Optional[str] = None
+    level: Optional[str] = None
     capacity: int = 100
     bin_type: Literal["storage", "picking", "staging", "quarantine"] = "storage"
 
@@ -260,8 +260,9 @@ class BinLocation(BinLocationBase):
     status: str = "empty"  # empty, available, blocked, quality_hold
     material_id: Optional[str] = None
     material_code: Optional[str] = None
+    storage_type: Optional[str] = None
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
 
 # Stock Movement Models
 class StockMovement(BaseModel):
