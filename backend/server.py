@@ -3760,6 +3760,13 @@ try:
 except Exception as e:
     logger.warning(f"⚠️ SAP WM Phase 2 APIs not loaded: {str(e)}")
 
+try:
+    from wm_phase3_apis import wm_phase3_router
+    app.include_router(wm_phase3_router)
+    logger.info("✅ SAP WM Phase 3 APIs loaded successfully")
+except Exception as e:
+    logger.warning(f"⚠️ SAP WM Phase 3 APIs not loaded: {str(e)}")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
