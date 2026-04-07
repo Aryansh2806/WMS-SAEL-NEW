@@ -152,6 +152,12 @@ const GRN = () => {
   };
 
   const handleComplete = async (grn) => {
+    // Check if already completed
+    if (grn.status === 'completed') {
+      toast.info('This GRN is already completed');
+      return;
+    }
+    
     // Check if all items are inspected
     const hasPending = grn.items.some(item => 
       item.quality_inspection_status === 'pending' && item.pending_quantity > 0
@@ -168,10 +174,16 @@ const GRN = () => {
     
     try {
       const result = await grnAPI.complete(grn.grn_id);
-      toast.success(`GRN completed. Accepted: ${result.data.accepted_quantity}, Rejected: ${result.data.rejected_quantity}`);
+      toast.success(`GRN completed successfully!`);
       loadData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to complete GRN');
+      const errorMsg = error.response?.data?.detail || 'Failed to complete GRN';
+      if (errorMsg.includes('already completed')) {
+        toast.info('This GRN is already completed. Stock has been updated.');
+        loadData(); // Refresh to show updated status
+      } else {
+        toast.error(errorMsg);
+      }
     }
   };
 
@@ -796,6 +808,7 @@ const GRN = () => {
                               className="text-green-600 hover:text-green-700"
                               onClick={() => handleComplete(grn)}
                               data-testid={`complete-grn-${grn.grn_number}`}
+                              title="Complete GRN and update stock"
                             >
                               <Check className="w-4 h-4" />
                             </Button>
