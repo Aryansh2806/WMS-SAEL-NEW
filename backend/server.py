@@ -3749,9 +3749,16 @@ app.add_middleware(
 try:
     from wm_enhanced_apis import wm_router
     app.include_router(wm_router)
-    logger.info("✅ SAP WM Enhanced APIs loaded successfully")
+    logger.info("✅ SAP WM Phase 1 APIs loaded successfully")
 except Exception as e:
-    logger.warning(f"⚠️ SAP WM Enhanced APIs not loaded: {str(e)}")
+    logger.warning(f"⚠️ SAP WM Phase 1 APIs not loaded: {str(e)}")
+
+try:
+    from wm_phase2_apis import wm_phase2_router
+    app.include_router(wm_phase2_router)
+    logger.info("✅ SAP WM Phase 2 APIs loaded successfully")
+except Exception as e:
+    logger.warning(f"⚠️ SAP WM Phase 2 APIs not loaded: {str(e)}")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
