@@ -3745,6 +3745,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ===================== IMPORT SAP WM ENHANCED APIS =====================
+try:
+    from wm_enhanced_apis import wm_router
+    app.include_router(wm_router)
+    logger.info("✅ SAP WM Enhanced APIs loaded successfully")
+except Exception as e:
+    logger.warning(f"⚠️ SAP WM Enhanced APIs not loaded: {str(e)}")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
