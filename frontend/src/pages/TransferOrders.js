@@ -19,18 +19,20 @@ const TransferOrders = () => {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       
       // Fetch Transfer Orders
       const toResponse = await fetch(`${backendUrl}/api/wm/transfer-orders`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        credentials: 'include',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
       const toData = await toResponse.json();
       setTransferOrders(toData.transfer_orders || []);
 
       // Fetch Transfer Requirements
       const trResponse = await fetch(`${backendUrl}/api/wm/transfer-requirements`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        credentials: 'include',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
       const trData = await trResponse.json();
       setTransferRequirements(trData.transfer_requirements || []);
@@ -46,12 +48,13 @@ const TransferOrders = () => {
     if (!selectedTR) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       const response = await fetch(`${backendUrl}/api/wm/transfer-orders/from-tr/${selectedTR}`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         }
       });
 
@@ -72,7 +75,7 @@ const TransferOrders = () => {
     if (!confirmed) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       
       // For simplicity, confirming with target quantities
       const to = transferOrders.find(t => t.to_number === toNumber);
@@ -83,9 +86,10 @@ const TransferOrders = () => {
 
       const response = await fetch(`${backendUrl}/api/wm/transfer-orders/${toNumber}/confirm`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify(confirmedQuantities)
       });
