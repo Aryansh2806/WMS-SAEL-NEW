@@ -18,6 +18,8 @@ import Issues from './pages/Issues';
 import Labels from './pages/Labels';
 import Reports from './pages/Reports';
 import Users from './pages/Users';
+import TransferOrders from './pages/TransferOrders';
+import WMReports from './pages/WMReports';
 
 // Protected Route wrapper
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -141,6 +143,22 @@ const AppRouter = () => {
         element={
           <ProtectedRoute allowedRoles={['Admin', 'Store In-Charge', 'Inventory Controller', 'Auditor', 'Management Viewer']}>
             <Reports />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/transfer-orders"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Store In-Charge', 'Warehouse Operator', 'Inventory Controller']}>
+            <TransferOrders />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/wm-reports"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Store In-Charge', 'Inventory Controller', 'Auditor', 'Management Viewer']}>
+            <WMReports />
           </ProtectedRoute>
         }
       />

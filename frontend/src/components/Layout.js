@@ -16,7 +16,9 @@ import {
   X,
   ChevronDown,
   Settings,
-  PieChart
+  PieChart,
+  ArrowLeftRight,
+  FileText
 } from 'lucide-react';
 import { Button } from './ui/button';
 import {
@@ -37,7 +39,9 @@ const navItems = [
   { path: '/bins', icon: MapPin, label: 'Bin Locations', roles: ['Admin', 'Store In-Charge', 'Inventory Controller', 'Auditor'] },
   { path: '/putaway', icon: ArrowDownToLine, label: 'Putaway', roles: ['Admin', 'Store In-Charge', 'Warehouse Operator'] },
   { path: '/issues', icon: ArrowUpFromLine, label: 'Material Issue', roles: ['Admin', 'Store In-Charge', 'Warehouse Operator'] },
+  { path: '/transfer-orders', icon: ArrowLeftRight, label: 'Transfer Orders', roles: ['Admin', 'Store In-Charge', 'Warehouse Operator', 'Inventory Controller'] },
   { path: '/reports', icon: BarChart3, label: 'Reports', roles: ['Admin', 'Store In-Charge', 'Inventory Controller', 'Auditor', 'Management Viewer'] },
+  { path: '/wm-reports', icon: FileText, label: 'WM Reports', roles: ['Admin', 'Store In-Charge', 'Inventory Controller', 'Auditor', 'Management Viewer'] },
   { path: '/users', icon: Users, label: 'User Management', roles: ['Admin'] },
 ];
 
