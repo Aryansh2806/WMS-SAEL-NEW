@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: wms-sael-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MONGO_URL
+        value: mongodb+srv://wmsadmin:aryan1234@clusterwpdmin.aqnq85h.mongodb.net/wms_sael?retryWrites=true&w=majority&appName=Clusterwpdmin
+      - key: DB_NAME
+        value: wms_sael
+      - key: JWT_SECRET
+        value: warehouse-inventory-secret-key-2024
+      - key: CORS_ORIGINS
+        value: "*"
